@@ -2296,7 +2296,7 @@ class Surface(CachedInstance):
 
     def plot_3d(self, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', colorbar=True, show_grid=True,
                 light=0.3, light_position=None, crop_white=True, cbar_pad=50, cbar_height=0.5, scale=1,
-                level_of_detail=100, save_to=None, interactive=False, window_title='surfalize',
+                level_of_detail=100, save_to=None, mode:str="streamlit", window_title='surfalize',
                 perspective_projection=True):
         """
         Renders a surface object in 3d using pyvista.
@@ -2333,9 +2333,14 @@ class Surface(CachedInstance):
             number of points in each axis by a factor of 2. Defaults to 100.
         save_to : str | pathlib.Path | None
             Path to where the plot should be saved.
-        interactive : bool
-            Specifies whether the plot should be shown in an interactive window. Does not currently work for jupyter.
-            Defaults to False.
+        mode :str = "streamlit"
+            selectable mode is
+                - "streamlit" : 
+                    Only return plotter for embed graphical image on Streamlit.
+                - "interactive" : 
+                    Specifies whether the plot should be shown in an interactive window. Does not currently work for jupyter.
+                - "static":
+                    Show static image.
         window_title : str
             The window title to show in interactive mode. Defaults to 'surfalize'.
         perspective_projection : bool
@@ -2345,7 +2350,7 @@ class Surface(CachedInstance):
         -------
         PIL.Image
         """
-        if interactive and save_to:
+        if (mode=="interactive" or mode=="streamlit") and save_to:
             raise ValueError('Argument "save_to" can only be set for static plots. '
                              'For interactive plots, use the widget save button.')
         image = plot_3d(
@@ -2363,7 +2368,7 @@ class Surface(CachedInstance):
             cbar_height=cbar_height,
             scale=scale,
             level_of_detail=level_of_detail,
-            interactive=interactive,
+            mode=mode,
             window_title=window_title,
             perspective_projection=perspective_projection
         )

@@ -42,7 +42,7 @@ def _create_colorbar(vmin, vmax, cmap, label='z (µm)', height=0.5):
 
 def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', colorbar=True, show_grid=True,
             light=0.3, light_position=None, crop_white=True, cbar_pad=50, cbar_height=0.5, scale=1,
-            level_of_detail=100, interactive=False, window_title='surfalize', perspective_projection=False):
+            level_of_detail=100, mode:str="streamlit", window_title='surfalize', perspective_projection=False):
     """
     Renders a surface object in 3d using pyvista.
 
@@ -78,9 +78,15 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
     level_of_detail : float
         Level of detail in % by which the topography is downsampled for the 3d plot. A value of 50 will downsample the
         number of points in each axis by a factor of 2. Defaults to 100.
-    interactive : bool
-        Specifies whether the plot should be shown in an interactive window. Does not currently work for jupyter.
-        Defaults to False.
+    mode :str = "streamlit"
+        selectable mode is
+            - "streamlit" : 
+                Only return plotter for embed graphical image on Streamlit.
+            - "interactive" : 
+                Specifies whether the plot should be shown in an interactive window. Does not currently work for jupyter.
+            - "static":
+                Show static image.
+                
     window_title : str
         The window title to show in interactive mode. Defaults to 'surfalize'.
     perspective_projection : bool
@@ -115,7 +121,7 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
     grid.point_data["height"] = z.T.ravel()
 
     # Initialize the PyVista plotter
-    plotter = pv.Plotter(off_screen=not interactive, window_size=None if interactive else (1920, 1080))
+    plotter = pv.Plotter(off_screen= (not mode=="interactive" or not mode=="streamlit"), window_size=None if mode=="static" else (1920, 1080))
     if not perspective_projection:
         plotter.enable_parallel_projection()
 
@@ -158,9 +164,11 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
             all_edges=True
         )
 
-    if interactive:
+    if mode == "interactive":
         plotter.show(title=window_title, jupyter_backend='client')
-    else:
+    elif mode == "streamlit":
+        return plotter
+    elif mode == "static":
         # Save the plot to a buffer
         buffer = io.BytesIO()
         plotter.screenshot(buffer)
@@ -185,5 +193,6 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
             composite.paste(img, (0, 0))
             composite.paste(cb, (img.width + cbar_pad, 0))
             img = composite
-
         return img
+    else :
+        raise ValueError("invalid mode was specified")
