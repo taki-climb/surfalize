@@ -35,7 +35,8 @@ dependencies = [
     "scikit-learn",
     "python-dateutil",
     "pillow",
-    "chardet"
+    "chardet",
+    "tifffile",
 ]
 
 [project.optional-dependencies]
