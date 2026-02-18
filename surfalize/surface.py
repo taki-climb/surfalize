@@ -2295,7 +2295,7 @@ class Surface(CachedInstance):
             fig.savefig(save_to, dpi=300, bbox_inches='tight')
         return fig, ax
 
-    def plot_3d(self, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', colorbar=True, show_grid=True,
+    def plot_3d(self, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', cmin=None, cmax=None, colorbar=True, show_grid=True,
                 light=0.3, light_position=None, crop_white=True, cbar_pad=50, cbar_height=0.5, scale=1,
                 level_of_detail=100, save_to=None, interactive=False, window_title='surfalize',
                 perspective_projection=True):
@@ -2312,6 +2312,10 @@ class Surface(CachedInstance):
             Zoom factor of the surface render. Defaults to 1. Decreasing the value will zoom out the render.
         cmap : str
             Matplotlib colormap name. Defaults to jet.
+        cmin : float
+            Minimum value of the colormap. Defaults to None.
+        cmax : float
+            Maximum value of the colormap. Defaults to None.
         colorbar : bool
             Whether to show a colorbar. Defaults to True.
         show_grid : bool
@@ -2355,6 +2359,8 @@ class Surface(CachedInstance):
             horizontal_angle=horizontal_angle,
             zoom=zoom,
             cmap=cmap,
+            cmin=cmin,
+            cmax=cmax, 
             colorbar=colorbar,
             show_grid=show_grid,
             light=light,

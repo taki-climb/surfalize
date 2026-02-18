@@ -1,4 +1,6 @@
 import io
+import warnings
+import operator
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageChops
@@ -40,7 +42,7 @@ def _create_colorbar(vmin, vmax, cmap, label='z (µm)', height=0.5):
     plt.close()
     return Image.open(buffer)
 
-def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', colorbar=True, show_grid=True,
+def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', cmin=None, cmax=None, colorbar=True, show_grid=True,
             light=0.3, light_position=None, crop_white=True, cbar_pad=50, cbar_height=0.5, scale=1,
             level_of_detail=100, interactive=False, window_title='surfalize', perspective_projection=False):
     """
@@ -58,6 +60,10 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         Zoom factor of the surface render. Defaults to 1. Decreasing the value will zoom out the render.
     cmap : str
         Matplotlib colormap name. Defaults to jet.
+    cmin : float
+        Minimum value of the colormap. Defaults to None.
+    cmax : float
+        Maximum value of the colormap. Defaults to None.
     colorbar : bool
         Whether to show a colorbar. Defaults to True.
     show_grid : bool
@@ -101,6 +107,16 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         surface = surface.__class__(ndimage.zoom(surface.data, factor),
                                     surface.step_x / factor,
                                     surface.step_y / factor)
+    if operator.xor(cmin is not None, cmax is not None):
+        warnings.warn('PyVista does not support setting only one of cmin and cmax.'
+                      'arguments that be passed None will be converted nanmin or nanmax value of the surface data, respectively.')
+        cmin = np.nanmin(surface.data) if cmin is None else cmin
+        cmax = np.nanmax(surface.data) if cmax is None else cmax
+        clim = (cmin, cmax)
+    elif cmin is None and cmax is None:
+        clim = None
+    else :
+        clim = (cmin, cmax)
 
     # Generate a grid of x, y values
     x = np.linspace(0, surface.width_um, surface.size.x)
@@ -120,7 +136,7 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         plotter.enable_parallel_projection()
 
     # Add the surface plot to the plotter
-    plotter.add_mesh(grid, cmap=cmap, scalars="height", show_edges=False, show_scalar_bar=False)
+    plotter.add_mesh(grid, cmap=cmap, clim=clim, scalars="height", show_edges=False, show_scalar_bar=False)
 
     plotter.set_scale(zscale=scale)
 
