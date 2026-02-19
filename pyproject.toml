@@ -37,6 +37,7 @@ dependencies = [
     "pillow",
     "chardet",
     "tifffile",
+    "xmltodict",
 ]
 
 [project.optional-dependencies]
