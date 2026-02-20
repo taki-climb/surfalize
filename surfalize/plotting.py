@@ -106,7 +106,7 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         factor = level_of_detail / 100
         surface = surface.__class__(ndimage.zoom(surface.data, factor),
                                     surface.step_x / factor,
-                                    surface.step_y / factor)
+                                    surface.step_y / factor)cmax is None
     if operator.xor(cmin is not None, cmax is not None):
         warnings.warn('PyVista does not support setting only one of cmin and cmax.'
                       'arguments that be passed None will be converted nanmin or nanmax value of the surface data, respectively.')
@@ -114,6 +114,8 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         cmax = np.nanmax(surface.data) if cmax is None else cmax
         clim = (cmin, cmax)
     elif cmin is None and cmax is None:
+        cmin = np.nanmin(surface.data) if cmin is None else cmin
+        cmax = np.nanmax(surface.data) if cmax is None else cmax
         clim = None
     else :
         clim = (cmin, cmax)
@@ -194,7 +196,7 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
                 img = img.crop((bbox[0], 0, bbox[2], img.height))
 
         if colorbar:
-            cb = _create_colorbar(np.nanmin(surface.data), np.nanmax(surface.data), cmap, height=cbar_height)
+            cb = _create_colorbar(cmin, cmax, cmap, height=cbar_height)
             cb = cb.resize((int(cb.width * img.height / cb.height), img.height))
 
             composite = Image.new('RGB', (img.width + cb.width + cbar_pad, img.height), (255, 255, 255))
