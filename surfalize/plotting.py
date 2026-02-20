@@ -106,7 +106,8 @@ def plot_3d(surface, vertical_angle=50, horizontal_angle=0, zoom=1, cmap='jet', 
         factor = level_of_detail / 100
         surface = surface.__class__(ndimage.zoom(surface.data, factor),
                                     surface.step_x / factor,
-                                    surface.step_y / factor)cmax is None
+                                    surface.step_y / factor)
+        
     if operator.xor(cmin is not None, cmax is not None):
         warnings.warn('PyVista does not support setting only one of cmin and cmax.'
                       'arguments that be passed None will be converted nanmin or nanmax value of the surface data, respectively.')
